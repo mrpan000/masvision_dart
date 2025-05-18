@@ -6,3 +6,5 @@ green_light_detector_node:
     upper_h: 100
     upper_s: 255
     upper_v: 255
+    manual_offset_x: 50    # 向右偏移50像素
+    manual_offset_y: 30   # 向上偏移30像素
