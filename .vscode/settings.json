@@ -1,0 +1,4 @@
+{
+    "cmake.ignoreCMakeListsMissing": true,
+    "files.autoSave": "afterDelay"
+}
