@@ -3,6 +3,7 @@
 #include <sensor_msgs/msg/camera_info.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
+#include "rm_interfaces/msg/green_light_detector.hpp"
 
 class GreenLightDetectorNode : public rclcpp::Node
 {
@@ -37,10 +38,15 @@ public:
       "camera_info", 10,
       std::bind(&GreenLightDetectorNode::cameraInfoCallback, this, std::placeholders::_1));
 
+
+    detect_pub_ = this->create_publisher<rm_interfaces::msg::GreenLightDetector>("green_light_detect", 10);
+
     RCLCPP_INFO(this->get_logger(), "Green Light Detector Node started.");
   }
 
 private:
+
+  rclcpp::Publisher<rm_interfaces::msg::GreenLightDetector>::SharedPtr detect_pub_;
   void cameraInfoCallback(const sensor_msgs::msg::CameraInfo::SharedPtr msg)
   {
     img_width_ = msg->width;
@@ -81,8 +87,17 @@ private:
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
-    bool detected = false;
-for (const auto& contour : contours) {
+    rm_interfaces::msg::GreenLightDetector detect_msg;
+    detect_msg.header.stamp = this->now();
+    detect_msg.header.frame_id = msg->header.frame_id;
+    detect_msg.detected = false;
+    detect_msg.dx = 0.0;
+    detect_msg.dy = 0.0;
+    detect_msg.distance = 0.0;
+
+
+bool detected = false;
+    for (const auto& contour : contours) {
       if (cv::contourArea(contour) > 100) {
         cv::Rect rect = cv::boundingRect(contour);
         cv::rectangle(img, rect, cv::Scalar(0,255,0), 2);
@@ -93,6 +108,12 @@ for (const auto& contour : contours) {
           int dx = green_center.x - manual_point_.x;
           int dy = green_center.y - manual_point_.y;
           double manual_dist = std::sqrt(dx * dx + dy * dy);
+
+          detect_msg.detected = true;
+          detect_msg.dx = dx;
+          detect_msg.dy = dy;
+          detect_msg.distance = manual_dist;
+
           RCLCPP_INFO(this->get_logger(),
             "Green light at [%d, %d], offset from manual point: dx=%d, dy=%d, distance: %.2f px",
             green_center.x, green_center.y, dx, dy, manual_dist);
@@ -100,8 +121,11 @@ for (const auto& contour : contours) {
           RCLCPP_INFO(this->get_logger(), "Green light detected at [%d, %d]", green_center.x, green_center.y);
         }
         detected = true;
+        break; // 只取第一个
       }
     }
+
+    detect_pub_->publish(detect_msg);
 
     if (!detected) {
       RCLCPP_INFO(this->get_logger(), "No green light detected.");

@@ -10,8 +10,18 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
+find_package(rm_interfaces REQUIRED)
+
 ament_auto_add_executable(green_light_detector
   src/green_light_detector.cpp
+)
+
+ament_target_dependencies(green_light_detector
+  rclcpp
+  sensor_msgs
+  cv_bridge
+  OpenCV
+  rm_interfaces
 )
 
 install(
