@@ -1,0 +1,8 @@
+green_light_detector_node:
+  ros__parameters:
+    lower_h: 30
+    lower_s: 80
+    lower_v: 80
+    upper_h: 100
+    upper_s: 255
+    upper_v: 255
