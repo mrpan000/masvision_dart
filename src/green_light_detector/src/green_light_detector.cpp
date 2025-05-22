@@ -31,12 +31,15 @@ public:
     this->get_parameter("manual_offset_y", manual_offset_y_);
 
     image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
-      "image_raw", 10,
-      std::bind(&GreenLightDetectorNode::imageCallback, this, std::placeholders::_1));
-
+      "image_raw",
+      rclcpp::SensorDataQoS(),
+      std::bind(&GreenLightDetectorNode::imageCallback, this, std::placeholders::_1)
+    );
     camera_info_sub_ = this->create_subscription<sensor_msgs::msg::CameraInfo>(
-      "camera_info", 10,
-      std::bind(&GreenLightDetectorNode::cameraInfoCallback, this, std::placeholders::_1));
+      "camera_info",
+      rclcpp::SensorDataQoS(),
+      std::bind(&GreenLightDetectorNode::cameraInfoCallback, this, std::placeholders::_1)
+    );
 
     detect_pub_ = this->create_publisher<rm_interfaces::msg::GreenLightDetector>("green_light_detect", 10);
 

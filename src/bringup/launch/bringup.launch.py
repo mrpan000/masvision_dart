@@ -16,13 +16,13 @@ def generate_launch_description():
         get_package_share_directory('mas_serial_driver'), 'config', 'serial_driver.yaml')
 
     return LaunchDescription([
-        #Node(
-        #    package='hik_camera',
-        #    executable='hik_camera_node',
-        #    output='screen',
-        #    emulate_tty=True,
-        #    parameters=[hik_camera_config, {'camera_info_url': hik_camera_info}],
-        #),
+        Node(
+           package='hik_camera',
+           executable='hik_camera_node',
+           output='screen',
+           emulate_tty=True,
+           parameters=[hik_camera_config, {'camera_info_url': hik_camera_info}],
+        ),
         Node(
             package='green_light_detector',
             executable='green_light_detector',
