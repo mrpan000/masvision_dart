@@ -1,0 +1,9 @@
+/mas_serial_driver:
+  ros__parameters:
+    target_frame: odom
+    device_name: /dev/ttyACM0
+    baud_rate: 115200
+    flow_control: none
+    parity: none
+    stop_bits: "1"
+
